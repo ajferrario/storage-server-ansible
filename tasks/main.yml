@@ -1,2 +1,33 @@
 ---
 # tasks file for storage-server
+- name: Upgrade all packages in CentOS machines
+  when: host_os_family == "CentOS"
+  yum: name=* state=latest
+
+- name: Upgrade all packages in Debian machines
+  when: host_os_family == "Debian"
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: make sure ufw is installed
+  package:
+    name: ufw
+    state: latest
+
+- name: make sure ZFS is installed
+  package:
+    name: zfsutils-linux
+    state: latest
+
+- name: make sure NFS Server is installed
+  package:
+    name: nfs-kernel-server
+    state: latest
+
+- name: Reboot system if required
+  command: shutdown -r now 'Rebooting to complete system upgrade'
+  args:
+    removes: /var/run/reboot-required
+
